@@ -110,21 +110,20 @@ class BST:
         TODO: Write your implementation
         """
         new_node = BSTNode(value)
+        parent = None
+        current_node = self._root
+        while current_node != None:
+            parent = current_node
+            if value < current_node.value:
+                current_node = current_node.left
+            else:
+                current_node = current_node.right
         if self.is_empty():
             self._root = new_node
+        elif value < parent.value:
+            parent.left = new_node
         else:
-            parent = None
-            current_node = self._root
-            while current_node != None:
-                parent = current_node
-                if value < current_node.value:
-                    current_node = current_node.left
-                else:
-                    current_node = current_node.right
-            if value < parent.value:
-                parent.left = new_node
-            else:
-                parent.right = new_node
+            parent.right = new_node
 
     def remove(self, value: object) -> bool:
         """
