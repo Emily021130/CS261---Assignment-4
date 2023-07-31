@@ -164,12 +164,12 @@ class BST:
         TODO: Write your implementation
         """
         current_node = self._root
-        while current_node != None and current_node.value != value:
+        while current_node.value != None and current_node.value != value:
             if value < current_node.value:
                 current_node = current_node.left
             else:
                 current_node = current_node.right
-        if current_node != None and current_node.value == value:
+        if current_node.value != None and current_node.value == value:
             return True
         else:
             return False
