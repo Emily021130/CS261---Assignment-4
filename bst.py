@@ -205,7 +205,7 @@ class BST:
         """
         TODO: Write your implementation
         """
-        pass
+        self._root = None
 
 
 # ------------------- BASIC TESTING -----------------------------------------
