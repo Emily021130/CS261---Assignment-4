@@ -188,7 +188,7 @@ class BST:
             return None
         else:
             current_node = self._root
-            while current_node != None:
+            while current_node.left != None:
                 current_node = current_node.left
             return current_node.value
 
