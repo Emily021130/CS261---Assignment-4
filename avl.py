@@ -103,38 +103,95 @@ class AVL(BST):
         """
         TODO: Write your implementation
         """
-        new_node = AVLNode(value)
+        node = AVLNode(value)
         if self.is_empty():
-            self._root = new_node
+            self._root = node
         else:
-            current_node = self._root
-            while current_node != None:
-                if value < current_node.value and current_node.left != None:
-                    current_node = current_node.left
-                elif value < current_node.value and current_node.left == None:
-                    current_node.left = new_node
-                    new_node.parent = current_node
-                    current_node = False
-                elif value > current_node.value and current_node.right != None:
-                    current_node = current_node.right
-                elif value > current_node.value and current_node.right == None:
-                    current_node.right = new_node
-                    new_node.parent = current_node
-                    current_node = False
+            cur = self._root
+            while cur:
+                if value < cur.value:
+                    if cur.left:
+                        cur = cur.left
+                    else:
+                        cur.left = node
+                        node.parent = cur
+                        cur = False
+                elif value > cur.value:
+                    if cur.right:
+                        cur = cur.right
+                    else:
+                        cur.right = node
+                        node.parent = cur
+                        cur = False
                 else:
                     return
             if self.is_valid_avl():
                 return
             else:
-                while new_node:
-                    self._rebalance(new_node)
-                    new_node = new_node.parent
+                while node:
+                    self._rebalance(node)
+                    node = node.parent
 
     def remove(self, value: object) -> bool:
         """
         TODO: Write your implementation
         """
-        
+        if not self.contains(value):
+            return False
+        node_changed = AVLNode(0)
+
+        def bfs(root, key):
+            nonlocal node_changed
+            if not root:
+                return root
+            if key < root.value:
+                root.left = bfs(root.left, key)
+            elif key > root.value:
+                root.right = bfs(root.right, key)
+            else:
+                if root.left and root.right:
+                    if root.right.left:
+                        leftmost = root.right.left
+                        while leftmost.left:
+                            leftmost = leftmost.left
+                        leftmostParent = leftmost.parent
+                        node_changed = leftmost
+                        if leftmost.right:
+                            leftmostParent.left = leftmost.right
+                            leftmost.right.parent = leftmostParent
+                        else:
+                            leftmostParent.left = None
+                        root.value = leftmost.value
+                    else:
+                        root.right.left = root.left
+                        root.left.parent = root.right
+                        root.right.parent = root.parent
+                        root = root.right
+                        node_changed = root.left
+                elif root.left:
+                    root.value = root.left.value
+                    node_changed = root.left
+                    root.left = None
+                elif root.right:
+                    root.value = root.right.value
+                    node_changed = root.right
+                    root.right = None
+                else:
+                    if not root.parent:
+                        self.make_empty()
+                    else:
+                        node_changed = root
+                    root = None
+            return root
+        self._root = bfs(self.root, value)
+        if not node_changed:
+            return True
+        target = node_changed.parent
+        while target:
+            self._rebalance(target)
+            target = target.parent
+        return True
+
 
     # Experiment and see if you can use the optional                         #
     # subtree removal methods defined in the BST here in the AVL.            #
@@ -168,8 +225,7 @@ class AVL(BST):
         """
         if not node:
             return -1
-        else:
-            return node.height
+        return node.height
 
     def _rotate_left(self, node: AVLNode) -> AVLNode:
         """
@@ -232,6 +288,7 @@ class AVL(BST):
             else:
                 newParent.right = newRoot
         elif self._balance_factor(node) == 2:
+            # the R-L case
             if self._balance_factor(node.right) < 0:
                 node.right = self._rotate_right(node.right)
                 node.right.parent = node
