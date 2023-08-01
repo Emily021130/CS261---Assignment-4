@@ -129,9 +129,11 @@ class BST:
         """
         TODO: Write your implementation
         """
-        """new_node = BSTNode(value)
-        parent = None
+        new_node = BSTNode(value)
+        if self._root is None:
+            return False
         current_node = self._root
+        parent = None
         while current_node != None:
             if new_node.value < current_node.value:
                 parent = current_node
@@ -146,7 +148,8 @@ class BST:
                     self._remove_one_subtree(parent, current_node)
                 else:
                     self._remove_two_subtrees(parent, current_node)
-        return False"""
+                return True
+        return False
 
     # Consider implementing methods that handle different removal scenarios; #
     # you may find that you're able to use some of them in the AVL.          #
