@@ -103,34 +103,50 @@ class AVL(BST):
         """
         TODO: Write your implementation
         """
-        node = AVLNode(value)
         if self.is_empty():
-            self._root = node
+            self._root = AVLNode(value)
+            self._root.height = 0
+        elif self.contains(value) is True:
+            pass
         else:
-            cur = self._root
-            while cur:
-                if value < cur.value:
-                    if cur.left:
-                        cur = cur.left
-                    else:
-                        cur.left = node
-                        node.parent = cur
-                        cur = False
-                elif value > cur.value:
-                    if cur.right:
-                        cur = cur.right
-                    else:
-                        cur.right = node
-                        node.parent = cur
-                        cur = False
+            current_node = self._root
+            last_node = self._root
+            current_height = 0
+            while current_node is not None:
+                current_height += 1
+                if value < current_node.value:
+                    last_node = current_node
+                    current_node = current_node.left
+                elif value > current_node.value:
+                    last_node = current_node
+                    current_node = current_node.right
                 else:
-                    return
-            if self.is_valid_avl():
-                return
+                    pass
+            new_node = AVLNode(value)
+            new_node.parent = last_node
+            if value < last_node.value:
+                last_node.left = new_node
+                new_node.height = 0
             else:
-                while node:
-                    self._rebalance(node)
-                    node = node.parent
+                last_node.right = new_node
+                new_node.height = 0
+            current_node = new_node.parent
+            last_node = new_node
+            # Adjusts the heights of each node
+            while last_node != self._root:
+                self._update_height(current_node)
+                current_node = current_node.parent
+                last_node = last_node.parent
+
+            current_node = new_node.parent
+            root_height = self._root.height
+            loop_counter = 0
+            while loop_counter <= root_height + 1:
+                if self._balance_factor(current_node) > 1 and current_node.left is not None:
+                    current_node = self._rotate_right(current_node)
+                elif self._balance_factor(current_node) < -1 and current_node.right is not None:
+                    current_node = self._rotate_left(current_node)
+                loop_counter += 1
 
     def remove(self, value: object) -> bool:
         """
