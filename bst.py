@@ -226,12 +226,15 @@ class BST:
         """
         TODO: Write your implementation
         """
-        """empty_queue = Queue()
-        
-        if self.is_empty():
-            return empty_queue
-        else:
-            current_node = self._root"""
+        queue = Queue()
+        def inOrder(node, ans):
+            if not node:
+                return
+            inOrder(node.left, ans)
+            ans.enqueue(node.value)
+            inOrder(node.right, ans)
+        inOrder(self._root, queue)
+        return queue
 
     def find_min(self) -> object:
         """
