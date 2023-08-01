@@ -132,12 +132,10 @@ class AVL(BST):
                 new_node.height = 0
             current_node = new_node.parent
             last_node = new_node
-            # Adjusts the heights of each node
             while last_node != self._root:
                 self._update_height(current_node)
                 current_node = current_node.parent
                 last_node = last_node.parent
-
             current_node = new_node.parent
             root_height = self._root.height
             loop_counter = 0
@@ -152,62 +150,7 @@ class AVL(BST):
         """
         TODO: Write your implementation
         """
-        if not self.contains(value):
-            return False
-        node_changed = AVLNode(0)
-
-        def bfs(root, key):
-            nonlocal node_changed
-            if not root:
-                return root
-            if key < root.value:
-                root.left = bfs(root.left, key)
-            elif key > root.value:
-                root.right = bfs(root.right, key)
-            else:
-                if root.left and root.right:
-                    if root.right.left:
-                        leftmost = root.right.left
-                        while leftmost.left:
-                            leftmost = leftmost.left
-                        leftmostParent = leftmost.parent
-                        node_changed = leftmost
-                        if leftmost.right:
-                            leftmostParent.left = leftmost.right
-                            leftmost.right.parent = leftmostParent
-                        else:
-                            leftmostParent.left = None
-                        root.value = leftmost.value
-                    else:
-                        root.right.left = root.left
-                        root.left.parent = root.right
-                        root.right.parent = root.parent
-                        root = root.right
-                        node_changed = root.left
-                elif root.left:
-                    root.value = root.left.value
-                    node_changed = root.left
-                    root.left = None
-                elif root.right:
-                    root.value = root.right.value
-                    node_changed = root.right
-                    root.right = None
-                else:
-                    if not root.parent:
-                        self.make_empty()
-                    else:
-                        node_changed = root
-                    root = None
-            return root
-        self._root = bfs(self.root, value)
-        if not node_changed:
-            return True
-        target = node_changed.parent
-        while target:
-            self._rebalance(target)
-            target = target.parent
-        return True
-
+        pass
 
     # Experiment and see if you can use the optional                         #
     # subtree removal methods defined in the BST here in the AVL.            #
@@ -233,7 +176,16 @@ class AVL(BST):
         """
         TODO: Write your implementation
         """
-        return self._get_height(node.right) - self._get_height(node.left)
+        if node.left is not None:
+            left_height = node.left.height
+        else:
+            left_height = -1
+        if node.right is not None:
+            right_height = node.right.height
+        else:
+            right_height = -1
+        balance_factor = left_height - right_height
+        return balance_factor
 
     def _get_height(self, node: AVLNode) -> int:
         """
@@ -247,42 +199,51 @@ class AVL(BST):
         """
         TODO: Write your implementation
         """
-        temp = node.right
-        node.right = temp.left
-        if node.right:
-            node.right.parent = node
-        temp.left = node
-        node.parent = temp
-        self._update_height(node)
-        self._update_height(temp)
-        return temp
+        original_root = node
+        new_root = node.right
+        secondary_node = new_root.left
+        new_root.left = original_root
+        original_root.parent = new_root
+        original_root.right = secondary_node
+        if secondary_node is not None:
+            self._update_height(secondary_node)
+        self._update_height(original_root)
+        self._update_height(new_root)
+        return node
 
     def _rotate_right(self, node: AVLNode) -> AVLNode:
         """
         TODO: Write your implementation
         """
-        temp = node.left
-        node.left = temp.right
-        if node.left:
-            node.left.parent = node
-        temp.right = node
-        node.parent = temp
-        self._update_height(node)
-        self._update_height(temp)
-        return temp
+        original_root = node
+        new_root = node.left
+        secondary_node = new_root.right
+        new_root.right = original_root
+        original_root.parent = new_root
+        original_root.left = secondary_node
+        if secondary_node is not None:
+            self._update_height(secondary_node)
+        self._update_height(original_root)
+        self._update_height(new_root)
+        return node
 
     def _update_height(self, node: AVLNode) -> None:
         """
         TODO: Write your implementation
         """
-        if node.left and node.right:
-            node.height = max(node.left.height, node.right.height) + 1
-        elif node.left:
-            node.height = node.left.height + 1
-        elif node.right:
-            node.height = node.right.height + 1
+        if node.left is None:
+            left_height = -1
         else:
-            node.height = 0
+            left_height = node.left.height
+
+        if node.right is None:
+            right_height = -1
+        else:
+            right_height = node.right.height
+        if left_height >= right_height:
+            node.height = left_height + 1
+        else:
+            node.height = right_height + 1
 
     def _rebalance(self, node: AVLNode) -> None:
         """
@@ -304,7 +265,6 @@ class AVL(BST):
             else:
                 newParent.right = newRoot
         elif self._balance_factor(node) == 2:
-            # the R-L case
             if self._balance_factor(node.right) < 0:
                 node.right = self._rotate_right(node.right)
                 node.right.parent = node
