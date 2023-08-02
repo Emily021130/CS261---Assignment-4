@@ -3,8 +3,8 @@
 # Course: CS261 - Data Structures
 # Assignment: Assignment 4
 # Due Date: 07/31/2023
-# Description: Implement the AVL class which includes two methods add() and remove(). It will inherit
-#              methods from BST.
+# Description: Implement the AVL class which includes two methods add() and remove(). It will also
+#              inherit methods from BST.
 
 
 import random
