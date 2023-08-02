@@ -102,8 +102,8 @@ class AVL(BST):
 
     def add(self, value: object) -> None:
         """
-        Add a new value to the tree while maintaining its AVL property. Duplicate values are not allowed.
-        Nothing changes if the value is already in the tree.
+        Add a new value to the tree while maintaining its AVL property. Duplicate values are not
+        allowed. Nothing changes if the value is already in the tree.
         """
         if self.is_empty():
             self._root = AVLNode(value)
